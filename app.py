@@ -64,12 +64,12 @@ def get_article_content_newspaper(url):
 
 # --- AI Summarization Function (remains the same) ---
 @st.cache_data(show_spinner="Summarizing article...")
-def summarize_text(summarizer, text):
+def summarize_text(text, _summarizer):
     # We need to make sure the input text is truncated to the model's max input length
     # The distilbart-cnn-12-6 model has a max input of 1024 tokens.
     # It's good practice to provide a reasonable max_length for the output as well.
     try:
-        summary = summarizer(
+        summary = _summarizer(
             text,
             max_length=150, # Max length of the output summary
             min_length=30,  # Min length of the output summary
