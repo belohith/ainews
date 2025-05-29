@@ -52,29 +52,26 @@ def get_article_content_newspaper(url):
         article.parse()
         
         # Check if the article has sufficient text and is likely a news article
-        # Newspaper3k often identifies the main text.
-        # You can add more checks here if needed (e.g., minimum article.text length)
         if article.text and len(article.text) > 200: # Heuristic for meaningful article
             return article.text
         else:
             return None # Not a typical article or not enough content
     except Exception as e:
-        # print(f"Error with newspaper3k for {url}: {e}") # For debugging
         return None
 
-# --- AI Summarization Function (remains the same) ---
+# --- AI Summarization Function ---
 @st.cache_data(show_spinner="Summarizing article...")
-def summarize_text(text, _summarizer):
+def summarize_text(text, _summarizer): # Keep the underscore as _summarizer is unhashable
     # We need to make sure the input text is truncated to the model's max input length
     # The distilbart-cnn-12-6 model has a max input of 1024 tokens.
     # It's good practice to provide a reasonable max_length for the output as well.
     try:
         summary = _summarizer(
-            text,
+            text, # 'text' is hashable, so no underscore needed here
             max_length=150, # Max length of the output summary
             min_length=30,  # Min length of the output summary
             do_sample=False,
-            truncation=True # <--- CRITICAL: This tells the tokenizer to truncate the input
+            truncation=True # CRITICAL: This tells the tokenizer to truncate the input
                             # to the model's maximum accepted length (e.g., 1024 tokens).
         )[0]['summary_text']
         return summary
@@ -101,6 +98,15 @@ def main():
     Select a news source from the sidebar and get instant summaries of top headlines.
     """)
 
+    # --- ADD THIS NEW DISCLAIMER HERE ---
+    st.info("""
+    **Important Note:** This app currently fetches headlines from **Hacker News (Y Combinator)** only.
+    Please be aware that Hacker News often links to discussions, blog posts, or technical papers,
+    not always traditional news articles. For these types of links, an AI summary may not be possible or relevant.
+    More diverse news sources will be added in future updates!
+    """)
+    # --- END OF DISCLAIMER ---
+
     summarizer_pipeline = load_summarizer_model()
 
     # --- Sidebar for settings ---
@@ -125,13 +131,7 @@ def main():
         if headlines:
             display_headlines = headlines[:num_articles_to_display]
 
-            # --- REMAINS THE SAME FOR NOW, WILL CHANGE FOR SINGLE COLUMN BELOW ---
-            # cols = st.columns(2)
-            # col_idx = 0
-
             for i, article in enumerate(display_headlines):
-                # with cols[col_idx % 2]: # This line will be removed for single column
-                # Use a container for each article card for better visual grouping
                 with st.container(border=True): # border=True gives a nice visual separation
                     st.markdown(f"#### {article['title']}")
                     st.markdown(f"**Link:** [Read Full Article]({article['link']})")
@@ -145,7 +145,6 @@ def main():
                     summarize_button_key = f"summarize_btn_{i}"
                     if st.button("Summarize", key=summarize_button_key):
                         with st.spinner("Getting article content and summarizing..."):
-                            # Call the new newspaper3k function
                             article_content = get_article_content_newspaper(article['link'])
                             if article_content:
                                 summary = summarize_text(article_content, summarizer_pipeline)
@@ -155,7 +154,6 @@ def main():
                         st.rerun()
 
                 st.markdown("") # Add a small gap between article containers
-                # col_idx += 1 # This line will be removed for single column
         else:
             st.warning("No headlines found or an error occurred. Please try again later.")
     elif news_source == "Select a source":
