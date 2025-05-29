@@ -2,6 +2,8 @@
 
 This Streamlit application leverages a powerful pre-trained Large Language Model (LLM) to instantly summarize news articles. Users can input a URL to a news article, and the AI will generate a concise summary, making it easy to quickly grasp the main points without reading the entire piece.
 
+**[Click here to open the Dashboard!](https://ainews-belohith.streamlit.app/)**
+
 ## ✨ Features
 
 * **Article Summarization:** Generates quick summaries of news articles from provided URLs.
