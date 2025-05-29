@@ -22,10 +22,9 @@ This Streamlit application leverages a powerful pre-trained Large Language Model
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/YourGitHubUsername/ai-news-summarizer.git](https://github.com/YourGitHubUsername/ai-news-summarizer.git)
-    cd ai-news-summarizer
+    git clone [https://github.com/belohith/ainews](https://github.com/belohith/ainews)
+    cd ainews
     ```
-    (Replace `YourGitHubUsername` with your actual GitHub username and adjust repo name if different.)
 
 2.  **Create a virtual environment:**
     ```bash
