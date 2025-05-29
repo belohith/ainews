@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 from transformers import pipeline
+from newspaper import Article # Import Article from newspaper3k
 
 # --- Configuration ---
 SUMMARIZER_MODEL = "sshleifer/distilbart-cnn-12-6"
