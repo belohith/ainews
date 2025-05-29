@@ -63,15 +63,28 @@ def get_article_content_newspaper(url):
         return None
 
 # --- AI Summarization Function (remains the same) ---
-@st.cache_data
-def summarize_text(text, _summarizer_pipeline):
-    if not text or len(text.strip()) < 50:
-        return "Not enough content to generate a summary."
+@st.cache_data(show_spinner="Summarizing article...")
+def summarize_text(summarizer, text):
+    # We need to make sure the input text is truncated to the model's max input length
+    # The distilbart-cnn-12-6 model has a max input of 1024 tokens.
+    # It's good practice to provide a reasonable max_length for the output as well.
     try:
-        summary = _summarizer_pipeline(text, max_length=130, min_length=30, do_sample=False)[0]['summary_text']
+        summary = summarizer(
+            text,
+            max_length=150, # Max length of the output summary
+            min_length=30,  # Min length of the output summary
+            do_sample=False,
+            truncation=True # <--- CRITICAL: This tells the tokenizer to truncate the input
+                            # to the model's maximum accepted length (e.g., 1024 tokens).
+        )[0]['summary_text']
         return summary
     except Exception as e:
-        return f"Could not summarize this article due to an AI model error: {e}"
+        st.error(f"AI summarization failed with an internal model error: {e}")
+        # Optionally, you can print the length of the text for debugging
+        # st.write(f"Debug: Input text length was {len(text)} characters.")
+        return "Could not summarize this article due to an AI model error. The article might be too complex or too long for the model."
+
+
 
 # --- Main Streamlit Application ---
 def main():
